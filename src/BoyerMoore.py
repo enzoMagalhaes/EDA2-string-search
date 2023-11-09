@@ -1,0 +1,3 @@
+
+class BoyerMoore:
+	pass
