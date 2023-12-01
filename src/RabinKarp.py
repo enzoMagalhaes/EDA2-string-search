@@ -1,12 +1,17 @@
-class RK:
-    def search(text, pattern, prime=101):
+from .AbsStringMatch import AbsStringMatch
+
+
+class RK(AbsStringMatch):
+    def search(self, text, pattern, prime=101):
+        self.iteration_counter = 0
         if not text or not pattern:
-            return -1
+            return []
 
         n, m = len(text), len(pattern)
         pattern_hash = 0
         text_hash = 0
         h = 1  # Hash multiplier
+        occurrences = []
 
         # Calculate hash multiplier
         for i in range(m - 1):
@@ -19,10 +24,15 @@ class RK:
 
         # Slide the pattern over the text and compare hashes
         for i in range(n - m + 1):
-            if pattern_hash == text_hash:
+            if self.cmp(pattern_hash, text_hash):
                 # Check character by character to avoid hash collisions
-                if text[i : i + m] == pattern:
-                    return i
+                match = True
+                for j in range(m):
+                    if not self.cmp(text[i + j], pattern[j]):
+                        match = False
+                        break
+                if match:
+                    occurrences.append(i)
 
             # Calculate hash for the next window in the text
             if i < n - m:
@@ -32,4 +42,4 @@ class RK:
                 if text_hash < 0:
                     text_hash += prime
 
-        return -1  # Pattern not found
+        return occurrences

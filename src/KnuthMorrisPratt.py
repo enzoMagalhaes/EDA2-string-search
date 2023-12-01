@@ -1,4 +1,7 @@
-class KMP:
+from .AbsStringMatch import AbsStringMatch
+
+
+class KMP(AbsStringMatch):
     def build_kmp_table(pattern):
         table = [0] * len(pattern)
         j = 0
@@ -14,25 +17,28 @@ class KMP:
 
         return table
 
-    def search(text, pattern):
+    def search(self, text, pattern):
+        self.iteration_counter = 0
         if not text or not pattern:
-            return -1
+            return []
 
         m, n = len(pattern), len(text)
         kmp_table = KMP.build_kmp_table(pattern)
+        occurrences = []
 
         i = j = 0
         while i < n:
-            if pattern[j] == text[i]:
+            if self.cmp(pattern[j], text[i]):
                 i += 1
                 j += 1
 
                 if j == m:
-                    return i - j
+                    occurrences.append(i - j)
+                    j = kmp_table[j - 1]
             else:
                 if j != 0:
                     j = kmp_table[j - 1]
                 else:
                     i += 1
 
-        return -1
+        return occurrences

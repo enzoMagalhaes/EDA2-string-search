@@ -1,33 +1,35 @@
-class BMH:
-    def bad_character_table(pattern):
-        table = {}
-        m = len(pattern)
+from .AbsStringMatch import AbsStringMatch
+from collections import defaultdict
 
-        for i in range(m - 1):
-            table[pattern[i]] = m - 1 - i
 
+class BMH(AbsStringMatch):
+    def bad_char_table(pattern, m):
+        table = defaultdict(lambda: m)
+        for k in range(m - 1):
+            table[ord(pattern[k])] = m - k - 1
         return table
 
-    def search(text, pattern):
-        if not text or not pattern:
+    def search(self, text, pattern):
+        self.iteration_counter = 0
+        m = len(pattern)
+        n = len(text)
+
+        if m > n:
             return -1
 
-        n, m = len(text), len(pattern)
-        bad_char_table = BMH.bad_character_table(pattern)
+        bad_char_table = BMH.bad_char_table(pattern, m)
+        occurrences = []
 
-        i = m - 1
-        while i < n:
+        k = m - 1
+        while k < n:
             j = m - 1
-
-            while j >= 0 and text[i] == pattern[j]:
-                i -= 1
+            i = k
+            while j >= 0 and self.cmp(text[i], pattern[j]):
                 j -= 1
-
+                i -= 1
             if j == -1:
-                return i + 1  # Pattern found
+                occurrences.append(i + 1)
 
-            bad_char = bad_char_table.get(text[i], m)
+            k += bad_char_table[ord(text[k])]
 
-            i += bad_char
-
-        return -1  # Pattern not found
+        return occurrences

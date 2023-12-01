@@ -1,4 +1,7 @@
-class BM:
+from .AbsStringMatch import AbsStringMatch
+
+
+class BM(AbsStringMatch):
     def generate_bad_char_table(pattern):
         table = {}
         pattern_length = len(pattern)
@@ -40,26 +43,29 @@ class BM:
 
         return j
 
-    def search(text, pattern):
+    def search(self, text, pattern):
+        self.iteration_counter = 0
         bad_char_table = BM.generate_bad_char_table(pattern)
         good_suffix_table = BM.generate_good_suffix_table(pattern)
 
         text_length = len(text)
         pattern_length = len(pattern)
-        i = 0
 
+        occurrences = []
+        i = 0
         while i <= text_length - pattern_length:
             j = pattern_length - 1
 
-            while j >= 0 and pattern[j] == text[i + j]:
+            while j >= 0 and self.cmp(pattern[j], text[i + j]):
                 j -= 1
 
             if j < 0:
-                return i  # Match found
+                occurrences.append(i)  # Match found
+                i += pattern_length  # Move to the next possible position
+            else:
+                bad_char = bad_char_table.get(text[i + j], pattern_length)
+                good_suffix = good_suffix_table[j]
 
-            bad_char = bad_char_table.get(text[i + j], pattern_length)
-            good_suffix = good_suffix_table[j]
+                i += max(bad_char, good_suffix)
 
-            i += max(bad_char, good_suffix)
-
-        return -1  # No match found
+        return occurrences
