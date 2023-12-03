@@ -26,19 +26,14 @@ class KMP(AbsStringMatch):
         kmp_table = KMP.build_kmp_table(pattern)
         occurrences = []
 
-        i = j = 0
-        while i < n:
-            if self.cmp(pattern[j], text[i]):
-                i += 1
-                j += 1
-
-                if j == m:
-                    occurrences.append(i - j)
-                    j = kmp_table[j - 1]
-            else:
-                if j != 0:
-                    j = kmp_table[j - 1]
-                else:
-                    i += 1
+        q = 0
+        for i in range(n):
+            while q > 0 and not self.cmp(pattern[q], text[i]):
+                q = kmp_table[q - 1]
+            if self.cmp(pattern[q], text[i]):
+                q += 1
+            if q == m:
+                occurrences.append(i - m)
+                q = kmp_table[q - 1]
 
         return occurrences

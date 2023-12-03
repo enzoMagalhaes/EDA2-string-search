@@ -24,15 +24,8 @@ class RK(AbsStringMatch):
 
         # Slide the pattern over the text and compare hashes
         for i in range(n - m + 1):
-            if self.cmp(pattern_hash, text_hash):
-                # Check character by character to avoid hash collisions
-                match = True
-                for j in range(m):
-                    if not self.cmp(text[i + j], pattern[j]):
-                        match = False
-                        break
-                if match:
-                    occurrences.append(i)
+            if self.cmp(pattern_hash, text_hash) and self.cmp(text[i : i + m], pattern):
+                occurrences.append(i)
 
             # Calculate hash for the next window in the text
             if i < n - m:
